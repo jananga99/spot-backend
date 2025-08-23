@@ -3,6 +3,9 @@ from flask_restful import Api
 from mongoengine import connect
 from app.config import Config
 
+from app.routes.health import HealthResource
+from app.routes.config_route import ConfigResource, SingleConfigResource
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -12,7 +15,8 @@ def create_app():
     api = Api(app)
     
     # Import routes
-    from app.routes.health import HealthResource
     api.add_resource(HealthResource, '/health')
+    api.add_resource(ConfigResource, '/config')
+    api.add_resource(SingleConfigResource, '/config/<string:name>')
     
     return app
