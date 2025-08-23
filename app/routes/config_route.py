@@ -8,6 +8,7 @@ from app.services.config_service import (
 )
 from mongoengine.errors import DoesNotExist
 
+
 class ConfigResource(Resource):
     def put(self):
         parser = reqparse.RequestParser()
@@ -16,20 +17,32 @@ class ConfigResource(Resource):
         data = parser.parse_args()
 
         config = create_or_update_config(data["name"], data["value"])
-        return {"name": config.name, "value": config.value}, 200
+        return {
+            "data": {
+                "id": str(config.id),
+                "name": config.name,
+                "value": config.value,
+                "createdAt": config.createdAt.isoformat(),
+                "lastUpdatedAt": config.lastUpdatedAt.isoformat()
+            },
+            "message": "Config created or updated successfully"
+        }, 200
 
     def get(self):
         configs = get_all_configs()
-        return [
-            {
-                "id": str(c.id),
-                "name": c.name,
-                "value": c.value,
-                "createdAt": c.createdAt.isoformat(),
-                "lastUpdatedAt": c.lastUpdatedAt.isoformat()
-            }
-            for c in configs
-        ], 200
+        return {
+            "data": [
+                {
+                    "id": str(c.id),
+                    "name": c.name,
+                    "value": c.value,
+                    "createdAt": c.createdAt.isoformat(),
+                    "lastUpdatedAt": c.lastUpdatedAt.isoformat()
+                }
+                for c in configs
+            ],
+            "message": "Configs retrieved successfully"
+        }, 200
 
 
 class SingleConfigResource(Resource):
@@ -37,18 +50,24 @@ class SingleConfigResource(Resource):
         try:
             config = get_config_by_name(name)
             return {
-                "id": str(config.id),
-                "name": config.name,
-                "value": config.value,
-                "createdAt": config.createdAt.isoformat(),
-                "lastUpdatedAt": config.lastUpdatedAt.isoformat()
+                "data": {
+                    "id": str(config.id),
+                    "name": config.name,
+                    "value": config.value,
+                    "createdAt": config.createdAt.isoformat(),
+                    "lastUpdatedAt": config.lastUpdatedAt.isoformat()
+                },
+                "message": "Config retrieved successfully"
             }, 200
         except DoesNotExist:
-            abort(404, description=f"Config '{name}' not found")
+            abort(404, description={"data": None, "message": f"Config '{name}' not found"})
 
     def delete(self, name):
         try:
             delete_config_by_name(name)
-            return {"message": f"Config '{name}' deleted successfully"}, 200
+            return {
+                "data": None,
+                "message": f"Config '{name}' deleted successfully"
+            }, 200
         except DoesNotExist:
-            abort(404, description=f"Config '{name}' not found")
+            abort(404, description={"data": None, "message": f"Config '{name}' not found"})

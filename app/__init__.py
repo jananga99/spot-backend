@@ -5,6 +5,7 @@ from app.config import Config
 
 from app.routes.health import HealthResource
 from app.routes.config_route import ConfigResource, SingleConfigResource
+from app.routes.uncategorized_coin_route import UncategorizedCoinResource
 
 def create_app():
     app = Flask(__name__)
@@ -18,5 +19,6 @@ def create_app():
     api.add_resource(HealthResource, '/health')
     api.add_resource(ConfigResource, '/config')
     api.add_resource(SingleConfigResource, '/config/<string:name>')
+    api.add_resource(UncategorizedCoinResource, '/uncategorized-coins')
     
     return app
