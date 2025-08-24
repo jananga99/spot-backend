@@ -1,12 +1,13 @@
-from mongoengine import Document, StringField, FloatField, DateTimeField, signals
+from mongoengine import Document, StringField, FloatField, DateTimeField, signals, DateField, IntField
 import datetime
 
 class SelectedCoin(Document):
-    name = StringField(required=True, unique=True)
+    name = StringField(required=True)
     volatility = FloatField(required=True)
     volume = FloatField(required=True)
-    effectiveDate = DateTimeField(required=True)
-    endDate = DateTimeField(required=False, null=True)
+    riskLevel = IntField(required=True)
+    effectiveDate = DateField(required=True)   # when it became selected
+    endDate = DateField(null=True)             # when selection ended
     createdAt = DateTimeField(default=datetime.datetime.utcnow)
     lastUpdatedAt = DateTimeField(default=datetime.datetime.utcnow)
 
